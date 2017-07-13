@@ -9,47 +9,66 @@
 
     <!-- initialize livefyre -->
     <script>
-            // makes a get request
-            function httpGetAsync(theUrl, callback) {
-                var xmlHttp = new XMLHttpRequest();
-                xmlHttp.onreadystatechange = function () {
-                    if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
-                        callback(xmlHttp.responseText);
-                }
-                xmlHttp.open("GET", theUrl, true); // true for asynchronous
-                xmlHttp.send(null);
+        // makes a get request
+        function httpGetAsync(theUrl, callback) {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                    callback(xmlHttp.responseText);
             }
+            xmlHttp.open("GET", theUrl, true); // true for asynchronous
+            xmlHttp.send(null);
+        }
 
-            function initLiveFyre(response) {
 
-                var responseObj = JSON.parse(response);
+        function initLiveFyre(response) {
 
-                //tokens "look" normal
-                console.log(responseObj);
-                console.log(responseObj["token"]); // eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0aXRsZSI6InBvYy1jb21tZW50cyIsInVybCI6Imh0dHA6Ly9kZXNpZ25lci1hcHAubGl2ZWZ5cmUuY29tL2FwcC8xNDk5MzU5Nzk3MDY0IiwidHlwZSI6ImxpdmVjb21tZW50cyIsImFydGljbGVJZCI6ImRlc2lnbmVyLWFwcC0xNDk5MzU5Nzk3MDY0In0.vrhjy80qX8OtxmQHKnD6qth9BP-FnlIMIbc__IKf3Qo
-                console.log(responseObj["checksum"]); //8b52d79cc97e89e6f45e83c6c860e89f
+            var responseObj = JSON.parse(response);
 
-                var networkConfig = {
-                    network: "microsoft-windows-uat.fyre.co"
+            console.log("collectionMetaToken = " + responseObj["collectionMetaToken"]); // eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0aXRsZSI6InBvYy1jb21tZW50cyIsInVybCI6Imh0dHA6Ly9kZXNpZ25lci1hcHAubGl2ZWZ5cmUuY29tL2FwcC8xNDk5MzU5Nzk3MDY0IiwidHlwZSI6ImxpdmVjb21tZW50cyIsImFydGljbGVJZCI6ImRlc2lnbmVyLWFwcC0xNDk5MzU5Nzk3MDY0In0.vrhjy80qX8OtxmQHKnD6qth9BP-FnlIMIbc__IKf3Qo
+            console.log("checksum" + responseObj["checksum"]); //8b52d79cc97e89e6f45e83c6c860e89f
+            console.log("authToken" + responseObj["authToken"]); //
+
+            var networkConfig = {
+                network: "microsoft-windows-uat.fyre.co",
+                env: 'staging' // needed for UAT
+            };
+            var convConfig = {
+                siteId: '306392',
+                articleId: 'designer-app-1499359797064',
+                el: 'livefyre',
+                collectionMeta: responseObj["collectionMetaToken"],
+                checksum: responseObj["checksum"]
+            };
+
+            Livefyre.require(['fyre.conv#3', 'auth'], function (Conv, auth) {
+                new Conv(networkConfig, [convConfig], function (commentsWidget) { }());
+
+                var authDelegate = {
+
+                    login: function (callback) {
+                        console.log("login");
+                        callback(null, {
+                            livefyre: responseObj["authToken"]
+                        });
+                    },
+
+                    logout: function (finishLogout) {
+                        console.log("logout");
+                        finishLogout(null);
+                    },
+
+                    viewProfile: function () { console.log("viewProfile"); },
+
+                    editProfile: function () { console.log("editProfile"); }
                 };
-                var convConfig = {
-                    siteId: '306392',
-                    articleId: 'designer-app-1499359797064',
-                    el: 'livefyre',
-                    collectionMeta: responseObj["token"],
-                    checksum: responseObj["checksum"]
-                };
 
-                window.Livefyre.require(['fyre.conv#3'], function (Conv) {
-                    new Conv(networkConfig, [convConfig], function (commentsWidget) { }());
-                });
+                auth.delegate(authDelegate);
+            });
+        }
 
-
-
-            }
-
-            // make request, pass callback
-            httpGetAsync("/Home/CollectionMetaTokens", initLiveFyre);
+        // make request, pass callback
+        httpGetAsync("/Home/LiveFyreTokens", initLiveFyre);
 
     </script>
 </div>

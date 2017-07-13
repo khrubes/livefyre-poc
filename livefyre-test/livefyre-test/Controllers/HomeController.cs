@@ -19,7 +19,7 @@ namespace LiveFrDemo2.Controllers
             return View();
         }
 
-        public string CollectionMetaTokens()
+        public string LiveFyreTokens()
         {
             //FOLLOWING: http://answers.livefyre.com/developers/reference/generating-livefyre-tokens/
 
@@ -78,14 +78,22 @@ namespace LiveFrDemo2.Controllers
             IBase64UrlEncoder urlEncoder = new JwtBase64UrlEncoder();
             IJwtEncoder encoder = new JwtEncoder(algorithm, serializer, urlEncoder);
 
-            var token = encoder.Encode(meta, siteKey);
+            var collectionMetaToken = encoder.Encode(meta, siteKey);
 
+            // Create auth token
+            var authpayload = new Dictionary<string, object>() {
+                { "domain", "microsoft-windows-uat.fyre.co" },
+                { "user_id", "user-00001" }, // todo generate unique
+                { "expires", DateTime.Now.AddDays(7).Ticks }, 
+                { "display_name", "johndoe" } // ? where do we get this??
+            };
 
-            /* Return the token and checksum to the clientside */
+            var authToken = encoder.Encode(authpayload, siteKey);
 
             var result = new Dictionary<string, string>() {
-                    { "token", token },
+                    { "collectionMetaToken", collectionMetaToken },
                     { "checksum", checksum },
+                    { "authToken", authToken }
                 };
 
             return JsonConvert.SerializeObject(result);
