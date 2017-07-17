@@ -80,11 +80,14 @@ namespace LiveFrDemo2.Controllers
 
             var collectionMetaToken = encoder.Encode(meta, siteKey);
 
+            long epochTicks = new DateTime(1970, 1, 1).Ticks;
+            var expiresTime = ((DateTime.Now.AddDays(7).Ticks - epochTicks) / TimeSpan.TicksPerSecond);
+
             // Create auth token
             var authpayload = new Dictionary<string, object>() {
                 { "domain", "microsoft-windows-uat.fyre.co" },
                 { "user_id", "user-00001" }, // todo generate unique
-                { "expires", DateTime.Now.AddDays(7).Ticks }, 
+                { "expires", expiresTime }, 
                 { "display_name", "johndoe" } // ? where do we get this??
             };
 

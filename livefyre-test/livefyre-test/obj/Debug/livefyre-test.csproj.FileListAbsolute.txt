@@ -65,6 +65,5 @@ C:\Users\t-kehru\Source\Repos\livefyre-poc\livefyre-test\livefyre-test\bin\Micro
 C:\Users\t-kehru\Source\Repos\livefyre-poc\livefyre-test\livefyre-test\bin\Microsoft.Owin.Security.Google.xml
 C:\Users\t-kehru\Source\Repos\livefyre-poc\livefyre-test\livefyre-test\bin\Microsoft.Owin.Security.Twitter.xml
 C:\Users\t-kehru\Source\Repos\livefyre-poc\livefyre-test\livefyre-test\bin\Microsoft.Owin.Security.MicrosoftAccount.xml
-C:\Users\t-kehru\Source\Repos\livefyre-poc\livefyre-test\livefyre-test\obj\Debug\livefyre-test.csprojResolveAssemblyReference.cache
 C:\Users\t-kehru\Source\Repos\livefyre-poc\livefyre-test\livefyre-test\obj\Debug\livefyre-test.dll
 C:\Users\t-kehru\Source\Repos\livefyre-poc\livefyre-test\livefyre-test\obj\Debug\livefyre-test.pdb

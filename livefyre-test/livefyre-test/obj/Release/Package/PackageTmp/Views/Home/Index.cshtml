@@ -1,0 +1,74 @@
+﻿@{
+    ViewBag.Title = "LiveFyre Demo";
+}
+
+<div class="jumbotron">
+    <h1>LiveFyre example</h1>
+    <!-- inseting livefyre -->
+    <div id='livefyre'> </div>
+
+    <!-- initialize livefyre -->
+    <script>
+        // makes a get request
+        function httpGetAsync(theUrl, callback) {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = function () {
+                if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+                    callback(xmlHttp.responseText);
+            }
+            xmlHttp.open("GET", theUrl, true); // true for asynchronous
+            xmlHttp.send(null);
+        }
+
+
+        function initLiveFyre(response) {
+
+            var responseObj = JSON.parse(response);
+
+            console.log("collectionMetaToken = " + responseObj["collectionMetaToken"]); // eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0aXRsZSI6InBvYy1jb21tZW50cyIsInVybCI6Imh0dHA6Ly9kZXNpZ25lci1hcHAubGl2ZWZ5cmUuY29tL2FwcC8xNDk5MzU5Nzk3MDY0IiwidHlwZSI6ImxpdmVjb21tZW50cyIsImFydGljbGVJZCI6ImRlc2lnbmVyLWFwcC0xNDk5MzU5Nzk3MDY0In0.vrhjy80qX8OtxmQHKnD6qth9BP-FnlIMIbc__IKf3Qo
+            console.log("checksum = " + responseObj["checksum"]); //8b52d79cc97e89e6f45e83c6c860e89f
+            console.log("authToken = " + responseObj["authToken"]); //eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkb21haW4iOiJtaWNyb3NvZnQtd2luZG93cy11YXQuZnlyZS5jbyIsInVzZXJfaWQiOiJ1c2VyLTAwMDAxIiwiZXhwaXJlcyI6MTUwMDYyNTkzMCwiZGlzcGxheV9uYW1lIjoiam9obmRvZSJ9.3vzg5EjZZF8jOIZlr-juOORYGHsbT9nhvHPr5bgTFUw
+
+            var networkConfig = {
+                network: "microsoft-windows-uat.fyre.co",
+                env: 'staging' // needed for UAT
+            };
+            var convConfig = {
+                siteId: '306392',
+                articleId: 'designer-app-1499359797064',
+                el: 'livefyre',
+                collectionMeta: responseObj["collectionMetaToken"],
+                checksum: responseObj["checksum"]
+            };
+
+            Livefyre.require(['fyre.conv#3', 'auth'], function (Conv, auth) {
+                new Conv(networkConfig, [convConfig], function (commentsWidget) { }());
+
+                var authDelegate = {
+
+                    login: function (callback) {
+                        console.log("login");
+                        callback(null, {
+                            livefyre: responseObj["authToken"]
+                        });
+                    },
+
+                    logout: function (finishLogout) {
+                        console.log("logout");
+                        finishLogout(null);
+                    },
+
+                    viewProfile: function () { console.log("viewProfile"); },
+
+                    editProfile: function () { console.log("editProfile"); }
+                };
+
+                auth.delegate(authDelegate);
+            });
+        }
+
+        // make request, pass callback
+        httpGetAsync("/Home/LiveFyreTokens", initLiveFyre);
+
+    </script>
+</div>
